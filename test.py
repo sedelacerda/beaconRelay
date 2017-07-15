@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import RPi.GPIO as GPIO
 import time
+import datetime
 import numpy as np
 from bluepy.btle import Scanner, DefaultDelegate
 
@@ -11,6 +12,7 @@ beaconList = [["d6:2b:0f:86:85:e9", "Beacon verde"]]
 SleepTimeL = 1
 activeBeacons = []
 distance = 60
+scannerTimeOut = 1.0
 
 for i in pinList:
     GPIO.setup(i, GPIO.OUT)
@@ -22,7 +24,7 @@ class ActiveBeacon:
     def __init__(self, beaconMac = "", beaconName = "", rssi = -999):
         self.addr = beaconMac
         self.name = beaconName
-        self.bufferRSSI = [-999, -999, -999, -999, -999]
+        self.bufferRSSI = [-999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999]
 
 
 class ScanDelegate(DefaultDelegate):
@@ -40,6 +42,8 @@ class ScanDelegate(DefaultDelegate):
                     # Actualizamos el ultimo RSSI del beacon
                     b.bufferRSSI[-1] = dev.rssi
                     if abs(b.bufferRSSI[-1]) <= distance:
+                        now = datetime.datetime.now().time()
+                        print "%s:%s:%s" % (now.hour, now.minute, now.second)
                         switchRelaysOn()
                     break
             print "Device = %s, RSSI = %d dB, count = %i" % (dev.addr, dev.rssi, dev.updateCount)
@@ -97,10 +101,9 @@ try:
     while True:
         #print "Still running..."
         #scanner.clear()
-        print '--------'
         powerRelays = False
         for b in activeBeacons:
-            print "%s, %s, %d, %d, %d, %d, %d, %d" % (b.addr, b.name, len(b.bufferRSSI), b.bufferRSSI[0], b.bufferRSSI[1], b.bufferRSSI[2], b.bufferRSSI[3], b.bufferRSSI[4])
+            # print "%s, %s, %d, %d, %d, %d, %d, %d" % (b.addr, b.name, len(b.bufferRSSI), b.bufferRSSI[0], b.bufferRSSI[1], b.bufferRSSI[2], b.bufferRSSI[3], b.bufferRSSI[4])
 
             for i in b.bufferRSSI:
                 if abs(i) < distance:
@@ -115,8 +118,7 @@ try:
         else:
             print "Power on"
 
-        print '--------'
-        scanner.process(1.0)
+        scanner.process(scannerTimeOut)
     # devices = scanner.scan(10.0)
     #
     # for dev in devices:
