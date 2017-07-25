@@ -8,12 +8,29 @@ from bluepy.btle import Scanner, DefaultDelegate
 # Setup
 GPIO.setmode(GPIO.BCM)
 pinList = [18, 23]
-beaconList = [["d6:2b:0f:86:85:e9", "Beacon verde"]]
+beaconList = []
 SleepTimeL = 1
 activeBeacons = []
-distance = 60
+distance = 83
 scannerTimeOut = 1.0
 
+# Load beacons list into beaconList array
+lines = open("beaconList.txt").readlines()
+k = 0
+for i in lines:
+    k = k+1
+    data = i.split(',')
+    beaconList.append([x.strip() for x in data])
+
+# Print beacons list
+print " -----------------"
+print "|Available beacons|"
+print " ----------------- \n"
+for x in range(0, len(beaconList)):
+    print beaconList[x]
+print "\n"
+
+# Setup GPIO
 for i in pinList:
     GPIO.setup(i, GPIO.OUT)
     GPIO.output(i, GPIO.HIGH)
@@ -46,7 +63,7 @@ class ScanDelegate(DefaultDelegate):
                         print "%s:%s:%s" % (now.hour, now.minute, now.second)
                         switchRelaysOn()
                     break
-            print "Device = %s, RSSI = %d dB, count = %i" % (dev.addr, dev.rssi, dev.updateCount)
+            print "Device = %s, RSSI = %d dB" % (dev.addr, dev.rssi)
 
 def addActiveBeacon(addr, rssi):
     if not isAnActiveBeacon(addr):
@@ -85,15 +102,21 @@ def switchRelaysOff():
 # Code
 
 try:
+    print " -----------------"
+    print "|   Test relays   |"
+    print " ----------------- \n"
     GPIO.output(18, GPIO.LOW)
-    print "ONE"
+    print "Testing relay 1"
     time.sleep(SleepTimeL);
     GPIO.output(23, GPIO.LOW)
-    print "TWO"
+    print "Testing relay 2"
     time.sleep(SleepTimeL);
     #GPIO.cleanup()
 
-    print "Starting BLE scan"
+    print "\n"
+    print " -----------------"
+    print "| Start BLE scan  |"
+    print " ----------------- \n"
     #p = btle.Peripheral("d6:2b:0f:86:85:e9", "random")
     scanner = Scanner().withDelegate(ScanDelegate())
     scanner.start()
