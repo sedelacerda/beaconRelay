@@ -130,6 +130,7 @@ try:
 
             for i in b.bufferRSSI:
                 if abs(i) < distance:
+                    print abs(i)
                     powerRelays = True
 
             del b.bufferRSSI[0]

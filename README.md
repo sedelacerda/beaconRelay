@@ -3,6 +3,9 @@ This project is destinated to activate relays connected to a Raspberry Pi 3 Mode
 
 # Dependencies
 BluePy: https://github.com/IanHarvey/bluepy
+```sh
+sudo pip install bluepy
+```
 
 # Use
 After install all dependencies, you will need to create a file named "beaconList.txt" in the same folder that you have the test.py file. In this new file you should put a list of the iBeacons you want to use as "<MAC ADDRESS>, <NAME OF BEACON>". For example:
